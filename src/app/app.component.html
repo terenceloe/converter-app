@@ -1,58 +1,43 @@
-
-  <form [formGroup]="newForm" (ngSubmit)="convert(newForm.value)">
+<form [formGroup]="newForm" (ngSubmit)="convert(newForm.value)">
   <h1 class="mat-display-1">Enter the value and choose your currency</h1>
 
-    <mat-form-field>
-      <mat-label>From</mat-label>
-      <mat-select formControlName="from">
-        <mat-option
-          *ngFor="let currSymbol of currSymbols$ | async"
-          [value]="currSymbol.code"
-          >{{ currSymbol.symbol + "  (" + currSymbol.code + ")" }}</mat-option
-        >
-      </mat-select>
-    </mat-form-field>
+  <mat-form-field>
+    <mat-label>From</mat-label>
+    <mat-select formControlName="from">
+      <mat-option
+        *ngFor="let currSymbol of currSymbols$ | async"
+        [value]="currSymbol.code"
+        >{{ currSymbol.symbol + "  (" + currSymbol.code + ")" }}</mat-option
+      >
+    </mat-select>
+  </mat-form-field>
 
-    <mat-form-field>
-      <mat-label>To</mat-label>
-      <mat-select formControlName="to">
-        <mat-option
-          *ngFor="let currSymbol of currSymbols$ | async"
-          [value]="currSymbol.code"
-          >{{ currSymbol.symbol + "  (" + currSymbol.code + ")" }}</mat-option
-        >
-      </mat-select>
-    </mat-form-field>
-    <mat-form-field>
-      <mat-label>Amount</mat-label>
-      <input matInput type="number" formControlName="amount" />
-    </mat-form-field>
+  <mat-form-field>
+    <mat-label>To</mat-label>
+    <mat-select formControlName="to">
+      <mat-option
+        *ngFor="let currSymbol of currSymbols$ | async"
+        [value]="currSymbol.code"
+        >{{ currSymbol.symbol + "  (" + currSymbol.code + ")" }}</mat-option
+      >
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Amount</mat-label>
+    <input matInput type="number" formControlName="amount" />
+  </mat-form-field>
 
-    <button
-      mat-raised-button
-      type="submit"
-      [disabled]="!newForm.valid"
-      color="primary"
-    >
-      Convert
-    </button>
-  </form>
+  <button
+    mat-raised-button
+    type="submit"
+    [disabled]="!newForm.valid"
+    color="primary"
+  >
+    Convert
+  </button>
+</form>
 
-  <p style="color: red;" *ngIf="error">{{ error | json }}</p>
+<p style="color: red;" *ngIf="error">{{ error | json }}</p>
 
-  <h5>{{ message }}</h5>
-
-  <!-- <input type="text" value={{currentVal}}>
-  <select>
-    <option *ngFor="let key of rateKeys" value="{{key}}">{{key}}</option>
-  </select>
-  <div class="row">
-    <div class="column">
-      <h2>Currency</h2>
-      <p *ngFor="let key of rateKeys">{{key}}</p>
-    </div>
-    <div class="column">
-      <h2>Value</h2>
-      <p *ngFor="value of convertedVal">{{value}}</p>
-    </div>
-  </div> -->
+<h5>{{ message }}</h5>
+<app-table *ngIf="data" [data]="data"></app-table>

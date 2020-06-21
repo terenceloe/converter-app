@@ -19,16 +19,9 @@ export interface TableElement {
 export class AppComponent implements OnInit {
   title = 'converter-app';
 
-  rate = {};
-  rates = [];
-  rateKeys = [];
-
-  symbol = {};
-  symbols = [];
-  symbolKeys = [];
-
   newForm: FormGroup;
   error;
+  data;
 
   message;
   currSymbols$ = this.currencyService.allSymbols$;
@@ -46,10 +39,17 @@ export class AppComponent implements OnInit {
       .getAllCurrencySymbols()
       .pipe(catchError((err) => (this.error = err)))
       .subscribe();
+    this.currencyService.getAll().subscribe((res) => {
+      this.data = res;
+      console.log(this.data);
+    });
   }
 
   convert(value) {
     console.log(value);
+    this.currencyService.getCurrency().subscribe((res) => {
+      console.log(res);
+    });
 
     // let from = this.newForm.controls['from'].value;
     // let to = this.newForm.controls['to'].value;

@@ -11,32 +11,43 @@ export class CurrencyService {
 
   private accessKey = '9420160af2030efa44b6226c602afa98';
   private baseUrl = 'http://data.fixer.io/api/';
-  allSymbols$ = new BehaviorSubject(null);
+  allSymbols$ = new BehaviorSubject<
+    {
+      code: string;
+      symbol: string;
+    }[]
+  >(null);
 
-  // & base = GBP
-  // & symbols = USD,CAD,EUR
   getAllCurrencySymbols() {
     return this.http
       .get(this.baseUrl + 'symbols?access_key=' + this.accessKey)
       .pipe(
-        map((x: { success: boolean; symbols?: {}; error?: {} }) => {
-          if (!x.success) {
-            throw x.error as Error;
-          }
-          const symbols = Object.values(x.symbols);
-          const codes = Object.keys(x.symbols);
-
-          this.allSymbols$.next(
-            codes.map((c, i) => {
+        map(
+          (x: {
+            success: boolean;
+            symbols?: { [key: string]: string };
+            error?: {};
+          }) => {
+            if (!x.success) {
+              throw x.error as Error;
+            }
+            const symbols = Object.values(x.symbols);
+            const codes = Object.keys(x.symbols);
+            this.allSymbols$.next(
+              codes.map((c, i) => {
+                return { code: c, symbol: symbols[i] };
+              })
+            );
+            return codes.map((c, i) => {
               return { code: c, symbol: symbols[i] };
-            })
-          );
-        })
+            });
+          }
+        )
       );
   }
-  private getCurrency() {
+  getCurrency() {
     return this.http
-      .get(this.baseUrl + 'latest?access_key=' + this.accessKey)
+      .get(`${this.baseUrl}latest?access_key=${this.accessKey}`)
       .pipe(
         map((x: { success: boolean; rates?: {}; error?: {} }) => {
           if (!x.success) {
@@ -47,20 +58,17 @@ export class CurrencyService {
       );
   }
 
-  // getAll() {
-  //   return combineLatest([
-  //     this.getCurrency(),
-  //     this.getAllCurrencySymbols(),
-  //   ]).pipe(
-  //     map((x) => {
-  //       const codes = Object.keys(x[0]);
-  //       const rates = Object.values(x[0]);
-  //       const symbols = Object.values(x[1]);
-
-  //       return codes.map((c, i) => {
-  //         return { code: c, rate: rates[i], symbol: symbols[i] };
-  //       });
-  //     })
-  //   );
-  // }
+  getAll() {
+    return combineLatest([
+      this.getCurrency(),
+      this.getAllCurrencySymbols(),
+    ]).pipe(
+      map((x) => {
+        const rates = Object.values(x[0]);
+        return x[1].map((c, i: number) => {
+          return { rate: rates[i], ...c };
+        });
+      })
+    );
+  }
 }

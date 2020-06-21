@@ -8,11 +8,13 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { ConverterPipe } from './converter.pipe';
 import { AngularMaterialModule } from './angular-material.module';
+import { TableComponent } from './table/table.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ConverterPipe,
+    TableComponent,
   ],
   imports: [
     BrowserModule,
