@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CurrencyService } from './currency.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import * as _ from "lodash";
+import * as _ from 'lodash';
 import { MatTableDataSource } from '@angular/material/table';
+import { catchError } from 'rxjs/operators';
 
 export interface TableElement {
   position: number;
@@ -13,80 +14,61 @@ export interface TableElement {
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
   title = 'converter-app';
 
-  rate = {};
-  rates = [];
-  rateKeys = [];
-
-  symbol = {};
-  symbols = [];
-  symbolKeys = [];
-
   newForm: FormGroup;
+  error;
+  data;
 
   message;
-  
-  constructor(private _currencyService: CurrencyService) {}
+  currSymbols$ = this.currencyService.allSymbols$;
+
+  constructor(private currencyService: CurrencyService) {
+    this.newForm = new FormGroup({
+      from: new FormControl('', Validators.required),
+      to: new FormControl('', Validators.required),
+      amount: new FormControl('', Validators.required),
+    });
+  }
 
   ngOnInit() {
-    this.newForm = new FormGroup({
-      from: new FormControl("", Validators.required),
-      to: new FormControl("", Validators.required),
-      amount: new FormControl("", Validators.required)
-    })
-
-    this._currencyService.getCurrency().subscribe(data => {
-      this.rate = data["rates"];
-      // console.log(this.rate);
-      this.rateKeys = Object.keys(this.rate);
-      // console.log(this.rateKeys);
-      for (var i = 0; i < this.rateKeys.length; i++) {
-        this.rates.push({
-          code: this.rateKeys[i],
-          text: this.rate[this.rateKeys[i]]
-        });
-      }
+    this.currencyService
+      .getAllCurrencySymbols()
+      .pipe(catchError((err) => (this.error = err)))
+      .subscribe();
+    this.currencyService.getAll().subscribe((res) => {
+      this.data = res;
+      console.log(this.data);
     });
-
-    this._currencyService.getCurrencySymbols().subscribe(data => {
-      this.symbol = data["symbols"];
-      console.log(this.symbol);
-      this.symbolKeys = Object.keys(this.symbol);
-      console.log(this.symbolKeys);
-      for (var i = 0; i < this.symbolKeys.length; i++) {
-        this.symbols.push({
-          code: this.symbolKeys[i],
-          text: this.symbol[this.symbolKeys[i]]
-        });
-      }
-    })
   }
 
-  convert() {
-    let from = this.newForm.controls["from"].value; 
-    let to = this.newForm.controls["to"].value;
-    let amount = this.newForm.controls["amount"].value;
-    let toIndex = _.findIndex(this.rates, rate => {
-      return rate.code == to;
+  convert(value) {
+    console.log(value);
+    this.currencyService.getCurrency().subscribe((res) => {
+      console.log(res);
     });
-    let fromIndex = _.findIndex(this.rates, rate => {
-      return rate.code == from;
-    });
-    let ratio = this.rates[toIndex].text / this.rates[fromIndex].text;
-    let cal = ratio * amount;
-    this.message =
-      amount +
-      " " +
-      this.rates[fromIndex].code +
-      " is equal to " +
-      cal +
-      " " +
-      this.rates[toIndex].code;
-  }
 
-  
+    // let from = this.newForm.controls['from'].value;
+    // let to = this.newForm.controls['to'].value;
+    // let amount = this.newForm.controls['amount'].value;
+    // let toIndex = _.findIndex(this.rates, (rate) => {
+    //   return rate.code == to;
+    // });
+    // let fromIndex = _.findIndex(this.rates, (rate) => {
+    //   return rate.code == from;
+    // });
+    // let ratio = this.rates[toIndex].text / this.rates[fromIndex].text;
+    // let cal = ratio * amount;
+    // this.message =
+    //   amount +
+    //   ' ' +
+    //   this.rates[fromIndex].code +
+    //   ' is equal to ' +
+    //   cal +
+    //   ' ' +
+    //   this.rates[toIndex].code;
+  }
 }

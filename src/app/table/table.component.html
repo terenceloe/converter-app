@@ -1,0 +1,25 @@
+<mat-table mat-table [dataSource]="dataSource" matSort>
+  <!-- Inner Table -->
+  <ng-container
+    matColumnDef="{{ column }}"
+    *ngFor="let column of columnsToDisplay"
+  >
+    <mat-header-cell mat-header-cell *matHeaderCellDef mat-sort-header>
+      {{ column | titlecase }}
+    </mat-header-cell>
+
+    <mat-cell mat-cell *matCellDef="let element">
+      <span> {{ element[column] }}</span>
+    </mat-cell>
+  </ng-container>
+
+  <!-- Table definition-->
+  <mat-header-row
+    mat-header-row
+    *matHeaderRowDef="columnsToDisplay"
+  ></mat-header-row>
+  <mat-row
+    mat-row
+    *matRowDef="let element; columns: columnsToDisplay"
+  ></mat-row>
+</mat-table>
